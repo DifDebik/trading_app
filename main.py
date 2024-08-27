@@ -4,7 +4,7 @@ from fastapi.exceptions import ValidationException
 from fastapi.responses import JSONResponse
 
 from typing import List
-from validation import Trade, User
+from schemas import Trade, User
 
 
 app = FastAPI(
