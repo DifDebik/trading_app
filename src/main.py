@@ -11,8 +11,9 @@ from redis import asyncio as aioredis
 from auth.base_config import auth_backend, fastapi_users
 from auth.schemas import UserCreate, UserRead
 from operations.router import router as router_operation
-from pages.router import router as pages
-from tasks.router import router as tasks_operation
+from pages.router import router as router_pages
+from tasks.router import router as router_tasks
+from chat.router import router as router_chat
 
 
 @asynccontextmanager
@@ -40,13 +41,14 @@ app.include_router(
     tags=["Auth"],
 )
 
-app.include_router(tasks_operation)
+app.include_router(router_tasks)
 app.include_router(router_operation)
-app.include_router(pages)
+app.include_router(router_pages)
+app.include_router(router_chat)
 
 origins = [
     "http://localhost",
-    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(
@@ -58,5 +60,3 @@ app.add_middleware(
                    "Access-Control-Allow-Headers",
                    "Access-Control-Allow-Origin"],
 )
-
-
