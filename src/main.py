@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
@@ -10,6 +11,7 @@ from redis import asyncio as aioredis
 from auth.base_config import auth_backend, fastapi_users
 from auth.schemas import UserCreate, UserRead
 from operations.router import router as router_operation
+from pages.router import router as pages
 from tasks.router import router as tasks_operation
 
 
@@ -24,6 +26,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.mount('/static', StaticFiles(directory='static'), name='static')
+
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/auth",
@@ -36,6 +40,9 @@ app.include_router(
     tags=["Auth"],
 )
 
+app.include_router(tasks_operation)
+app.include_router(router_operation)
+app.include_router(pages)
 
 origins = [
     "http://localhost",
@@ -47,10 +54,9 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'],
-    allow_headers=["Content-Type", "Set-Cookie", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin",
-                   "Authorization"],
+    allow_headers=["Content-Type", "Set-Cookie",
+                   "Access-Control-Allow-Headers",
+                   "Access-Control-Allow-Origin"],
 )
 
-app.include_router(tasks_operation)
 
-app.include_router(router_operation)
